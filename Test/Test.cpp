@@ -8,6 +8,7 @@
 #include "Test.h"
 #include "../src/dump.hpp"
 
+#include <cstring>
 #include <thread>
 
 using namespace park;
@@ -71,7 +72,7 @@ void TestDump()
 		// Clear for another run
 		constexpr bool release = true;
 		d.clear(release);
-		memset(adds, 0, NUM_ADDS * sizeof(adds[0]));
+		std::memset(adds, 0, NUM_ADDS * sizeof(adds[0]));
 
 		std::cout << ".";
 	}

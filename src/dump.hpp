@@ -11,6 +11,14 @@
 #include <type_traits>
 #include <vector>
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#elif defined(__GNUC__) || defined(__clang__)
+#include <immintrin.h> // Or <xmmintrin.h>
+#else
+#error "Compiler not supported"
+#endif
+
 namespace park
 {
 
