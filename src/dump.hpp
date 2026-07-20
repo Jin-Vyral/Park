@@ -2,7 +2,7 @@
 //
 // Protected under Karma License 1.0
 //
-// dump.hpp - simple thread-safe container
+// dump.hpp - simplest possible container
 
 #pragma once
 
@@ -14,7 +14,7 @@
 #if defined(_MSC_VER)
 #include <intrin.h>
 #elif defined(__GNUC__) || defined(__clang__)
-#include <immintrin.h> // Or <xmmintrin.h>
+#include <immintrin.h>
 #else
 #error "Compiler not supported"
 #endif
@@ -54,10 +54,17 @@ struct dump
 		_adds.fetch_add(1);
 	}
 
-	void trim() { _vec.resize(size()); }
+	void trim(const bool release = false)
+	{
+		_vec.resize(size());
+		if(release)
+			_vec.shrink_to_fit();
+	}
+
 	std::vector<T_Type>& get() { return _vec; }
 	const std::vector<T_Type>& get() const { return _vec; }
 	uint32_t size() const { return _adds; }
+	bool empty() const { return _vec.empty(); }
 
 	void clear(const bool release = false)
 	{
@@ -68,6 +75,7 @@ struct dump
 		{
 			pState->_max = 0;
 			_vec.resize(0);
+			_vec.shrink_to_fit();
 		}
 	}
 
