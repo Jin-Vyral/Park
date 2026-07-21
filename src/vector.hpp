@@ -11,23 +11,25 @@
 namespace park
 {
 
-struct vector : public dump<uint32_t>
+template<typename T_Type>
+struct vector : public base<T_Type>
 {
-	using T_Type = uint32_t;
-
 	void push_back(T_Type obj, uint32_t* pIndex = nullptr)
 	{
-		const uint32_t index = get_index();
-		_vec[index] = obj;
+		const uint32_t index = this->get_index();
+		this->_vec[index] = obj;
 		_info[index]._pIndex = pIndex;
 		_info[index]._removed = false;
-		lock_index();
+		this->lock_index();
+
+		if(pIndex)
+			*pIndex = index;
 	}
 
 protected:
 	void realloc(const uint32_t size) override
 	{
-		_vec.resize(size);
+		this->_vec.resize(size);
 		_info.resize(size);
 	}
 
