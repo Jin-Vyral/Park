@@ -6,21 +6,23 @@
 //
 
 #include "Test.h"
+
 #include "../src/dump.hpp"
 
 #include <cstring>
 #include <thread>
 
-using namespace park;
+static constexpr uint32_t NUM_ADDS = 1024 * 1024;
+static constexpr size_t NUM_THREADS = 16;
 
-static constexpr uint32_t NUM_ADDS = 1024 * 100;
-static const size_t NUM_THREADS = 16;
+park::dump<uint32_t> d;
 
-dump<uint32_t> d;
 uint32_t adds[NUM_ADDS]{ 0 };
 
 void TestDump()
 {
+	std::cout << "Test dump...\n\n";
+
 	while(true)
 	{
 		std::vector<std::thread> threads;
@@ -74,7 +76,7 @@ void TestDump()
 		d.clear(release);
 		std::memset(adds, 0, NUM_ADDS * sizeof(adds[0]));
 
-		std::cout << ".";
+		std::cout << "." << std::flush;
 	}
 }
 

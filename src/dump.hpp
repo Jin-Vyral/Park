@@ -27,36 +27,15 @@ struct dump
 {
 	void push_back(T_Type t)
 	{
-	try_add:
-		const uint64_t val = _state.fetch_add(1);
-		const State* pState = (State*)&val;
-		const uint32_t end = pState->_end;
-
-		if(end >= pState->_max)
-		{
-			if(end != pState->_max)
-			{
-				_mm_pause();
-				goto try_add;
-			}
-
-			while(_adds.load() != end)
-				_mm_pause();
-
-			const uint32_t size = std::max((uint32_t)_vec.size(), uint32_t(1)) * 2;
-			_vec.resize(size);
-
-			State newState{ ._end = end + 1, ._max = size };
-			_state.store(*(uint64_t*)&newState);
-		}
-
-		_vec[end] = t;
-		_adds.fetch_add(1);
+		const uint32_t index = get_index();
+		_vec[index] = t;
+		lock_index();
 	}
 
 	void trim(const bool release = false)
 	{
 		_vec.resize(size());
+
 		if(release)
 			_vec.shrink_to_fit();
 	}
@@ -79,7 +58,45 @@ struct dump
 		}
 	}
 
-private:
+protected:
+	virtual uint32_t get_index()
+	{
+	try_add:
+		const uint64_t val = _state.fetch_add(1);
+		const State* pState = (State*)&val;
+		const uint32_t index = pState->_end;
+
+		if(index >= pState->_max)
+		{
+			if(index != pState->_max)
+			{
+				_mm_pause();
+				goto try_add;
+			}
+
+			while(_adds.load() != index)
+				_mm_pause();
+
+			const uint32_t size = std::max((uint32_t)_vec.size(), uint32_t(1)) * 2;
+			realloc(size);
+
+			State newState{ ._end = index + 1, ._max = size };
+			_state.store(*(uint64_t*)&newState);
+		}
+
+		return index;
+	}
+
+	virtual void lock_index()
+	{
+		_adds.fetch_add(1);
+	}
+
+	virtual void realloc(const uint32_t size)
+	{
+		_vec.resize(size);
+	}
+
 	std::vector<T_Type> _vec;
 
 	struct State_LE
