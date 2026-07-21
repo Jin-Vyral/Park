@@ -44,6 +44,19 @@ struct base
 	uint32_t size() const { return _size; }
 	bool empty() const { return _vec.empty(); }
 
+	virtual void clear(const bool release = false)
+	{
+		BaseState* pState = (BaseState*)&_state;
+		pState->_end = _size = 0;
+
+		if(release)
+		{
+			pState->_max = 0;
+			_vec.resize(0);
+			_vec.shrink_to_fit();
+		}
+	}
+
 protected:
 	uint32_t get_index()
 	{

@@ -27,19 +27,6 @@ struct dump : public base<T_Type>
 		if(release)
 			this->_vec.shrink_to_fit();
 	}
-
-	void clear(const bool release = false)
-	{
-		BaseState* pState = (BaseState*)&this->_state;
-		pState->_end = this->_size = 0;
-
-		if(release)
-		{
-			pState->_max = 0;
-			this->_vec.resize(0);
-			this->_vec.shrink_to_fit();
-		}
-	}
 };
 
 }
