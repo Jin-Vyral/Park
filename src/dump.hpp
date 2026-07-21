@@ -25,10 +25,10 @@ namespace park
 template<typename T_Type>
 struct dump
 {
-	void push_back(T_Type t)
+	void push_back(T_Type obj)
 	{
 		const uint32_t index = get_index();
-		_vec[index] = t;
+		_vec[index] = obj;
 		lock_index();
 	}
 
