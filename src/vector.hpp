@@ -41,26 +41,50 @@ struct vector : public base<T_Type>
 	void remove(const uint32_t index)
 	{
 		_removes.push_back(index);
+		_info[index]._removed = true;
 	}
 
 	uint32_t prepare()
 	{
-		return _removes.size();
+		const uint32_t removes = _removes.size();
+		this->_size -= removes;
+		return removes;
 	}
 
 	void compress(const uint32_t removal)
 	{
-		const uint32_t removeId = _removes[removal];
+	try_remove:
+		const uint64_t val = this->_state.fetch_sub(1);
+		const BaseState* pState = (BaseState*)&val;
+		const uint32_t moveIndex = pState->_end - 1;
+
+		const uint32_t removeIndex = _removes.get()[removal];
+		if(moveIndex == removeIndex)
+			return;
+
+		if(_info[moveIndex]._removed)
+			goto try_remove;
+
+		this->_vec[removeIndex] = this->_vec[moveIndex];
+		_info[removeIndex] = _info[moveIndex];
+		*_info[removeIndex]._pIndex = removeIndex;
+	}
+
+	void finalize(const bool release = false)
+	{
+		_removes.clear(release);
 	}
 
 	void clear(const bool release = false) override
 	{
 		base<T_Type>::clear(release);
+		_removes.clear(release);
 
 		if(release)
 		{
 			_info.resize(0);
 			_info.shrink_to_fit();
+			_removes.trim(release);
 		}
 	}
 
