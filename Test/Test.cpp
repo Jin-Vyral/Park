@@ -104,49 +104,51 @@ void TestVector()
 	{
 		std::atomic<uint32_t> numIn = 0;
 
-		std::vector<std::thread> threads;
-		threads.reserve(NUM_THREADS);
-
-		const uint32_t each = NUM_ADDS;
-		uint32_t start = 0;
-		uint32_t end = start + each;
-
-		// Update vector
-		for(uint32_t i = 1; i <= NUM_THREADS; ++i)
 		{
-			threads.emplace_back([&numIn](const uint32_t start, const uint32_t end)
+			std::vector<std::thread> threads;
+			threads.reserve(NUM_THREADS);
+
+			const uint32_t each = NUM_ADDS;
+			uint32_t start = 0;
+			uint32_t end = start + each;
+
+			// Update vector
+			for(uint32_t i = 1; i <= NUM_THREADS; ++i)
 			{
-				std::random_device rd;
-				std::mt19937 gen(rd());
-				std::uniform_int_distribution<> distr(0, 1);
-
-				for(uint32_t j = start; j < end; ++j)
+				threads.emplace_back([&numIn](const uint32_t start, const uint32_t end)
 				{
-					Item* pItem = &_items[j];
-					const bool wasIn = pItem->_in;
-					const bool isIn = (bool)distr(gen);
+					std::random_device rd;
+					std::mt19937 gen(rd());
+					std::uniform_int_distribution<> distr(0, 1);
 
-					if(isIn)
-						++numIn;
+					for(uint32_t j = start; j < end; ++j)
+					{
+						Item* pItem = &_items[j];
+						const bool wasIn = pItem->_in;
+						const bool isIn = (bool)distr(gen);
 
-					if(!wasIn && isIn)
-						_v.push_back(pItem, &pItem->_index);
-					else if(wasIn && !isIn)
-						_v.remove(pItem->_index);
+						if(isIn)
+							++numIn;
 
-					_items[j]._in = isIn;
-				}
-			}, start, end);
+						if(!wasIn && isIn)
+							_v.push_back(pItem, &pItem->_index);
+						else if(wasIn && !isIn)
+							_v.remove(pItem->_index);
 
-			start = end;
-			end += each;
-		}
+						_items[j]._in = isIn;
+					}
+				}, start, end);
 
-		// Wait til finished
-		for(auto& t : threads)
-		{
-			if(t.joinable())
-				t.join();
+				start = end;
+				end += each;
+			}
+
+			// Wait til finished
+			for(auto& t : threads)
+			{
+				if(t.joinable())
+					t.join();
+			}
 		}
 
 		const uint32_t removes = _v.prepare();

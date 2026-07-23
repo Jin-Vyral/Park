@@ -53,12 +53,13 @@ struct vector : public base<T_Type>
 
 	void compress(const uint32_t removal)
 	{
+		const uint32_t removeIndex = _removes.get()[removal];
+
 	try_remove:
 		const uint64_t val = this->_state.fetch_sub(1);
 		const BaseState* pState = (BaseState*)&val;
 		const uint32_t moveIndex = pState->_end - 1;
 
-		const uint32_t removeIndex = _removes.get()[removal];
 		if(moveIndex == removeIndex)
 			return;
 
@@ -67,7 +68,9 @@ struct vector : public base<T_Type>
 
 		this->_vec[removeIndex] = this->_vec[moveIndex];
 		_info[removeIndex] = _info[moveIndex];
-		*_info[removeIndex]._pIndex = removeIndex;
+	
+		if(_info[removeIndex]._pIndex)
+			*_info[removeIndex]._pIndex = removeIndex;
 	}
 
 	void finalize(const bool release = false)
