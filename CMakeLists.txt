@@ -11,5 +11,8 @@ endif()
 
 project ("Park")
 
+# Set "Test" as the permanent startup item in Visual Studio
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Test)
+
 # Include sub-projects.
 add_subdirectory ("Test")
