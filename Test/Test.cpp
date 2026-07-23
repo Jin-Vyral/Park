@@ -135,12 +135,15 @@ void TestVector()
 						else if(wasIn && !isIn)
 							_v.remove(pItem->_index);
 
-						_items[j]._in = isIn;
+						pItem->_in = isIn;
 					}
 				}, start, end);
 
 				start = end;
-				end += each;
+				if(i == (NUM_THREADS - 1))
+					end = TOTAL_ELEMENTS;
+				else
+					end += each;
 			}
 
 			// Wait til finished
@@ -164,7 +167,7 @@ void TestVector()
 			// Compress
 			for(uint32_t i = 1; i <= NUM_THREADS; ++i)
 			{
-				threads.emplace_back([i](const uint32_t start, const uint32_t end)
+				threads.emplace_back([](const uint32_t start, const uint32_t end)
 				{
 					for(uint32_t j = start; j < end; ++j)
 						_v.compress(j);
@@ -184,6 +187,8 @@ void TestVector()
 					t.join();
 			}
 		}
+
+		_v.finalize();
 
 		if(_v.size() != numIn)
 		{
@@ -208,7 +213,6 @@ void TestVector()
 		}
 
 		std::cout << "." << std::flush;
-		_v.finalize();
 	}
 }
 
