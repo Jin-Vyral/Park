@@ -20,10 +20,11 @@ struct vector : public base<T_Type>
 		this->_vec[index] = obj;
 		_info[index]._pIndex = pIndex;
 		_info[index]._removed = false;
-		this->lock_index();
 
 		if(pIndex)
 			*pIndex = index;
+
+		this->lock_index();
 	}
 
 	void trim(const bool release = false)
@@ -46,22 +47,20 @@ struct vector : public base<T_Type>
 
 	uint32_t prepare()
 	{
-		const uint32_t removes = _removes.size();
-		this->_size -= removes;
-		return removes;
+		this->_size -= _removes.size();
+		return _removes.size();
 	}
 
 	void compress(const uint32_t removal)
 	{
 		const uint32_t removeIndex = _removes.get()[removal];
+		if(removeIndex > this->_size)
+			return;
 
 	try_remove:
 		const uint64_t val = this->_state.fetch_sub(1);
 		const BaseState* pState = (BaseState*)&val;
 		const uint32_t moveIndex = pState->_end - 1;
-
-		if(moveIndex == removeIndex)
-			return;
 
 		if(_info[moveIndex]._removed)
 			goto try_remove;
