@@ -84,7 +84,6 @@ struct vector : public base<T_Type>
 		{
 			_info.resize(0);
 			_info.shrink_to_fit();
-			_removes.trim(release);
 		}
 	}
 
