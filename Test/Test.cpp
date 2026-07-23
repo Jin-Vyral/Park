@@ -191,9 +191,16 @@ void TestVector()
 
 		for(uint32_t i = 0; i < _v.size(); ++i)
 		{
-			if(_v.get()[i]->_in == false)
+			const Item* pItem = _v.get()[i];
+			if(pItem->_in == false)
 			{
 				std::cout << "FAILURE!!!! Missing element\n\n";
+				return;
+			}
+
+			if(pItem->_index != i)
+			{
+				std::cout << "FAILURE!!!! Index mismatch\n\n";
 				return;
 			}
 		}
