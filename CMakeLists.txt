@@ -16,8 +16,8 @@ if(NOT MSVC)
   add_compile_options($<$<CONFIG:Release>:-O3>)
 endif()
 
-# Set "Test" as the permanent startup item in Visual Studio
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Test)
-
 # Include sub-projects.
 add_subdirectory ("Test")
+
+# Set "Test" as the permanent startup item in Visual Studio
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Test)
