@@ -62,14 +62,17 @@ struct vector : public base<T_Type>
 		const BaseState* pState = (BaseState*)&val;
 		const uint32_t moveIndex = pState->_end - 1;
 
-		if(_info[moveIndex]._removed)
+		Info* pMoveInfo = &_info[moveIndex];
+		if(pMoveInfo->_removed)
 			goto try_remove;
 
 		this->_vec[removeIndex] = this->_vec[moveIndex];
-		_info[removeIndex] = _info[moveIndex];
+
+		Info* pInfo = &_info[removeIndex];
+		*pInfo = *pMoveInfo;
 	
-		if(_info[removeIndex]._pIndex)
-			*_info[removeIndex]._pIndex = removeIndex;
+		if(pInfo->_pIndex)
+			*pInfo->_pIndex = removeIndex;
 	}
 
 	void finalize(const bool release = false)
