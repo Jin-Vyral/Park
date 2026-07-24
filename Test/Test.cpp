@@ -201,7 +201,7 @@ void TestVector()
 			const Item* pItem = _v.get()[i];
 			if(pItem->_in == false)
 			{
-				std::cout << "FAILURE!!!! Missing element\n\n";
+				std::cout << "FAILURE!!!! Invalid element\n\n";
 				return;
 			}
 

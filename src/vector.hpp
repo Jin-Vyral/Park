@@ -95,7 +95,7 @@ struct vector : public base<T_Type>
 protected:
 	void realloc(const uint32_t size) override
 	{
-		this->_vec.resize(size);
+		base<T_Type>::realloc(size);
 		_info.resize(size);
 	}
 
