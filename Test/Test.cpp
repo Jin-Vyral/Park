@@ -8,6 +8,7 @@
 #include "Test.h"
 
 #include "../src/dump.hpp"
+#include "../src/pool.hpp"
 #include "../src/vector.hpp"
 
 #include <cstring>
@@ -216,10 +217,71 @@ void TestVector()
 	}
 }
 
+void TestPool()
+{
+	std::cout << "Test pool...\n\n";
+
+	while(true)
+	{
+		park::pool _p;
+		park::dump<uint32_t*> _t;
+
+		std::vector<std::thread> threads;
+		threads.reserve(NUM_THREADS);
+
+		// Build the dump
+		for(uint32_t i = 1; i <= NUM_THREADS; ++i)
+		{
+			threads.emplace_back([&_t, &_p]()
+			{
+				for(uint32_t j = 0; j < NUM_ADDS; ++j)
+					_t.push_back(_p.acquire(j));
+			});
+		}
+
+		// Wait til finished
+		for(auto& t : threads)
+		{
+			if(t.joinable())
+				t.join();
+		}
+
+		_t.trim();
+		const std::vector<uint32_t*>& vec = _t.get();
+
+		// Validate vector contents
+		if(vec.size() != TOTAL_ELEMENTS)
+		{
+			std::cout << "FAILURE!!!! Size mismatch\n\n";
+			return;
+		}
+
+		for(uint32_t i = 0; i < TOTAL_ELEMENTS; ++i)
+			++adds[*vec[i]];
+
+		for(uint32_t i = 0; i < NUM_ADDS; ++i)
+		{
+			if(adds[i] != NUM_THREADS)
+			{
+				std::cout << "FAILURE!!!! Missing element\n\n";
+				return;
+			}
+		}
+
+		//// Clear for another run
+		//constexpr bool release = true;
+		//d.clear(release);
+		std::memset(adds, 0, NUM_ADDS * sizeof(adds[0]));
+
+		std::cout << "." << std::flush;
+	}
+}
+
 int main()
 {
 	//TestDump();
-	TestVector();
+	//TestVector();
+	TestPool();
 
 	return 0;
 }
