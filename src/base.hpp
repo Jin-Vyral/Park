@@ -39,6 +39,14 @@ using BaseState = std::conditional_t<std::endian::native == std::endian::little,
 template<typename T_Type>
 struct base
 {
+	base& operator=(base&& other)
+	{
+		_vec = std::move(other._vec);
+		_state = other._state.fetch_and(0ULL);
+		_size = other._size.fetch_and(0UL);
+		return *this;
+	}
+
 	std::vector<T_Type>& get() { return _vec; }
 	const std::vector<T_Type>& get() const { return _vec; }
 	uint32_t size() const { return _size; }
@@ -97,7 +105,7 @@ protected:
 	}
 
 	std::vector<T_Type> _vec;
-	std::atomic<uint64_t> _state;
+	std::atomic<uint64_t> _state{ 0 };
 	std::atomic<uint32_t> _size{ 0 };
 };
 
