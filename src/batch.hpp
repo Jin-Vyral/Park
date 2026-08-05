@@ -20,18 +20,14 @@ namespace park
 			_threads.reserve(count);
 		}
 
-		void prepare(const uint32_t count)
-		{
-			_count = count;
-			_threads.clear();
-		}
-
 		template<typename T_Func>
-		void run(T_Func&& func)
+		void run(const uint32_t count, T_Func&& func)
 		{
+			_threads.clear();
+
 			const size_t threads = _threads.capacity();
-			const size_t block = _count / threads;
-			const size_t extra = _count % threads;
+			const size_t block = count / threads;
+			const size_t extra = count % threads;
 			size_t start = 0;
 			size_t end = block;
 
@@ -55,7 +51,6 @@ namespace park
 
 	protected:
 		std::vector<std::thread> _threads;
-		size_t _count{ 0 };
 	};
 
 }

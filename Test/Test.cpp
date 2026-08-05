@@ -31,8 +31,7 @@ void TestDump()
 
 	while(true)
 	{
-		bat.prepare(TOTAL_ELEMENTS);
-		bat.run([](const uint32_t start, const uint32_t end)
+		bat.run(TOTAL_ELEMENTS, [](const uint32_t start, const uint32_t end)
 		{
 			for(uint32_t j = 0; j < NUM_ADDS; ++j)
 				_d.push_back(j);
@@ -100,8 +99,7 @@ void TestVector()
 	{
 		std::atomic<uint32_t> numIn{ 0 };
 
-		bat.prepare(TOTAL_ELEMENTS);
-		bat.run([&numIn](const uint32_t start, const uint32_t end)
+		bat.run(TOTAL_ELEMENTS, [&numIn](const uint32_t start, const uint32_t end)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -130,8 +128,7 @@ void TestVector()
 		const uint32_t removes = _v.prepare();
 		if(removes != 0)
 		{
-			bat.prepare(removes);
-			bat.run([](const uint32_t start, const uint32_t end)
+			bat.run(removes, [](const uint32_t start, const uint32_t end)
 			{
 				for(uint32_t j = start; j < end; ++j)
 					_v.compress(j);
@@ -148,8 +145,7 @@ void TestVector()
 			return;
 		}
 
-		bat.prepare(_v.size());
-		bat.run([](const uint32_t start, const uint32_t end)
+		bat.run(_v.size(), [](const uint32_t start, const uint32_t end)
 		{
 			for(uint32_t j = start; j < end; ++j)
 			{
@@ -219,8 +215,7 @@ void TestStack()
 
 		park::batch bat(NUM_THREADS);
 
-		bat.prepare(NUM_ADDS);
-		bat.run([&sadds](const uint32_t start, const uint32_t end)
+		bat.run(NUM_ADDS, [&sadds](const uint32_t start, const uint32_t end)
 		{
 			for(uint32_t j = start; j < end; ++j)
 			{
@@ -273,8 +268,7 @@ void TestPool()
 	{
 		std::atomic<uint32_t> numIn{ 0 };
 
-		bat.prepare(TOTAL_ELEMENTS);
-		bat.run([&numIn](const uint32_t start, const uint32_t end)
+		bat.run(TOTAL_ELEMENTS, [&numIn](const uint32_t start, const uint32_t end)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -305,8 +299,7 @@ void TestPool()
 
 		_p.reconcile();
 
-		bat.prepare(TOTAL_ELEMENTS);
-		bat.run([&numIn](const uint32_t start, const uint32_t end)
+		bat.run(TOTAL_ELEMENTS, [&numIn](const uint32_t start, const uint32_t end)
 		{
 			for(uint32_t j = start; j < end; ++j)
 			{
