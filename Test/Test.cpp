@@ -15,7 +15,6 @@
 
 #include <cstring>
 #include <random>
-#include <thread>
 
 static constexpr uint32_t NUM_ADDS = 1024 * 1024;
 static constexpr size_t NUM_THREADS = 16;

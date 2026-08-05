@@ -54,7 +54,7 @@ struct pool
 				if(curFree == (BLOCK_SIZE + PANIC_BUFFER))
 					_freeCur.store(BLOCK_SIZE + 1);
 
-				if(_frees.load() == 0)
+				if((_frees.load() == 0) || !should_reuse())
 					goto try_add;
 
 				goto try_reuse;
@@ -215,6 +215,7 @@ struct pool
 	}
 
 protected:
+	virtual bool should_reuse() { return true; }
 
 	struct block;
 

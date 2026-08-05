@@ -6,19 +6,8 @@
 
 #pragma once
 
-#include <atomic>
-#include <bit>
-#include <type_traits>
 #include <thread>
 #include <vector>
-
-#if defined(_MSC_VER)
-#include <intrin.h>
-#elif defined(__GNUC__) || defined(__clang__)
-#include <immintrin.h>
-#else
-#error "Compiler not supported"
-#endif
 
 namespace park
 {
