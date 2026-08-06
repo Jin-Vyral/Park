@@ -14,7 +14,7 @@ namespace park
 template<typename T_Type>
 struct vector : public base<T_Type>
 {
-	void push_back(T_Type obj, uint32_t* pIndex = nullptr)
+	uint32_t push_back(T_Type obj, uint32_t* pIndex = nullptr)
 	{
 		const uint32_t index = this->get_index();
 		this->_vec[index] = obj;
@@ -25,6 +25,7 @@ struct vector : public base<T_Type>
 			*pIndex = index;
 
 		this->lock_index();
+		return index;
 	}
 
 	void trim(const bool release = false)

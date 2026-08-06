@@ -14,11 +14,12 @@ namespace park
 template<typename T_Type>
 struct dump : public base<T_Type>
 {
-	void push_back(T_Type obj)
+	uint32_t push_back(T_Type obj)
 	{
 		const uint32_t index = this->get_index();
 		this->_vec[index] = obj;
 		this->lock_index();
+		return index;
 	}
 
 	void trim(const bool release = false)
