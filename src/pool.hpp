@@ -261,7 +261,7 @@ protected:
 
 		releases* _pPrev{ nullptr };
 		releases* _pNext{ nullptr };
-		object* _ptrs[RELEASES_SIZE];
+		object* _ptrs[RELEASES_SIZE]{ nullptr };
 		std::atomic<uint32_t> _acquired{ 0 };
 	};
 
