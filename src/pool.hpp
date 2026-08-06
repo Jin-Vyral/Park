@@ -12,10 +12,9 @@
 namespace park
 {
 
+template<typename T_Type>
 struct pool
 {
-	using T_Type = uint32_t;
-
 	static constexpr uint32_t BLOCK_SIZE = 1024;
 	static constexpr uint32_t RELEASES_SIZE = 1024;
 	static constexpr uint32_t PANIC_BUFFER = 1024 * 1024;

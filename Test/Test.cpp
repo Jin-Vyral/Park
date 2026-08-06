@@ -253,7 +253,7 @@ struct PItem
 };
 
 std::vector<PItem> _pitems;
-park::pool _p;
+park::pool<uint32_t> _p;
 
 void TestPool()
 {
