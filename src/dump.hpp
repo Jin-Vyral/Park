@@ -22,6 +22,16 @@ struct dump : public base<T_Type>
 		return index;
 	}
 
+
+	template<typename... Args>
+	uint32_t emplace_back(Args&&... args)
+	{
+		const uint32_t index = this->get_index();
+		new (&this->_vec[index]) T_Type(std::forward<Args>(args)...);
+		this->lock_index();
+		return index;
+	}
+
 	void trim(const bool release = false)
 	{
 		this->_vec.resize(this->size());
