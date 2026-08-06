@@ -11,7 +11,7 @@
 namespace park
 {
 
-	template<typename T_Type, uint64_t Max_Factor = (0xFFFFFFFFui64 >> 1), uint32_t Panic_Factor = 100>
+	template<typename T_Type, uint64_t Max_Factor = (0xFFFFFFFF >> 1), uint32_t Panic_Factor = 100>
 	struct stack : public dump<T_Type>
 	{
 		bool pop_back(T_Type& objOut)

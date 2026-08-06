@@ -9,6 +9,8 @@
 #include "stack.hpp"
 #include "vector.hpp"
 
+#include <cstring>
+
 namespace park
 {
 
