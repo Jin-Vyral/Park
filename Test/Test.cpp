@@ -221,7 +221,6 @@ void TestStack()
 	{
 		std::vector<std::atomic<uint32_t>> sadds(NUM_ADDS);
 
-		wrk.prepare();
 		wrk.run([&stk]()
 		{
 			for(uint32_t j = 0; j < NUM_ADDS; ++j)
@@ -236,8 +235,6 @@ void TestStack()
 			std::cout << "FAILURE!!!! Size mismatch\n\n";
 			return;
 		}
-
-		wrk.prepare();
 
 		wrk.run([&stk, &sadds]()
 		{
@@ -367,8 +364,8 @@ void TestPool()
 int main()
 {
 	//TestDump();
-	TestVector();
-	//TestStack();
+	//TestVector();
+	TestStack();
 	//TestPool();
 
 	return 0;
