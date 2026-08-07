@@ -20,7 +20,20 @@ static constexpr uint32_t NUM_ADDS = 1024 * 1024;
 static constexpr size_t NUM_THREADS = 16;
 static constexpr uint32_t TOTAL_ELEMENTS = NUM_ADDS * NUM_THREADS;
 
-park::dump<uint32_t> _d;
+struct Test
+{
+	Test() = default;
+	Test(const uint32_t index, const uint32_t foo)
+		: _index(index)
+		, _foo(foo)
+	{
+	}
+
+	uint32_t _index{ 0 };
+	uint32_t _foo{ 0 };
+};
+
+park::dump<Test> _d;
 uint32_t _adds[NUM_ADDS]{ 0 };
 
 void TestDump()
@@ -34,14 +47,14 @@ void TestDump()
 		bat.run(TOTAL_ELEMENTS, [](const uint32_t start, const uint32_t end)
 		{
 			for(uint32_t j = 0; j < NUM_ADDS; ++j)
-				_d.push_back(j);
+				_d.emplace_back(j, j + 1);
 		});
 
 		bat.wait();
 
 		// Validate vector contents
 		_d.trim();
-		const std::vector<uint32_t>& vec = _d.get();
+		const std::vector<Test>& vec = _d.get();
 
 		if(vec.size() != TOTAL_ELEMENTS)
 		{
@@ -50,7 +63,7 @@ void TestDump()
 		}
 
 		for(uint32_t i = 0; i < TOTAL_ELEMENTS; ++i)
-			++_adds[vec[i]];
+			++_adds[vec[i]._index];
 
 		for(uint32_t i = 0; i < NUM_ADDS; ++i)
 		{
@@ -86,6 +99,8 @@ struct Item
 std::vector<Item> _items;
 park::vector<Item*> _v;
 
+static constexpr bool REMOVE_SPECIFIC = true;
+
 void TestVector()
 {
 	std::cout << "Test vector...\n\n";
@@ -94,12 +109,13 @@ void TestVector()
 		_items.emplace_back(i);
 
 	park::batch bat(NUM_THREADS);
+	park::dump<uint32_t> removals;
 
 	while(true)
 	{
 		std::atomic<uint32_t> numIn{ 0 };
 
-		bat.run(TOTAL_ELEMENTS, [&numIn](const uint32_t start, const uint32_t end)
+		bat.run(TOTAL_ELEMENTS, [&numIn, &removals](const uint32_t start, const uint32_t end)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -117,7 +133,12 @@ void TestVector()
 				if(!wasIn && isIn)
 					_v.push_back(pItem, &pItem->_index);
 				else if(wasIn && !isIn)
-					_v.remove(pItem->_index);
+				{
+					if constexpr(REMOVE_SPECIFIC)
+						removals.push_back(_v.remove(pItem->_index));
+					else
+						_v.remove(pItem->_index);
+				}
 
 				pItem->_in = isIn;
 			}
@@ -128,11 +149,29 @@ void TestVector()
 		const uint32_t removes = _v.prepare();
 		if(removes != 0)
 		{
-			bat.run(removes, [](const uint32_t start, const uint32_t end)
+			if constexpr(REMOVE_SPECIFIC)
 			{
-				for(uint32_t j = start; j < end; ++j)
-					_v.compress(j);
-			});
+				if(removals.size() != removes)
+				{
+					std::cout << "FAILURE!!!! Removal mismatch\n\n";
+					return;
+				}
+
+				bat.run(removes, [&removals](const uint32_t start, const uint32_t end)
+				{
+					std::vector<uint32_t>& rv = removals.get();
+					for(uint32_t j = start; j < end; ++j)
+						_v.compress(rv[j]);
+				});
+			}
+			else
+			{
+				bat.run(removes, [](const uint32_t start, const uint32_t end)
+				{
+					for(uint32_t j = start; j < end; ++j)
+						_v.compress(j);
+				});
+			}
 
 			bat.wait();
 		}
@@ -165,7 +204,8 @@ void TestVector()
 		});
 
 		bat.wait();
-		
+		removals.clear();
+
 		std::cout << "." << std::flush;
 	}
 }
@@ -327,9 +367,9 @@ void TestPool()
 int main()
 {
 	//TestDump();
-	//TestVector();
+	TestVector();
 	//TestStack();
-	TestPool();
+	//TestPool();
 
 	return 0;
 }
