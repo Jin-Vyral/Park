@@ -50,7 +50,7 @@ struct base
 	std::vector<T_Type>& get() { return _vec; }
 	const std::vector<T_Type>& get() const { return _vec; }
 	uint32_t size() const { return _size; }
-	bool empty() const { return _vec.empty(); }
+	bool empty() const { return size() == 0; }
 
 	virtual void clear(const bool release = false)
 	{
