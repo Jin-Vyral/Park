@@ -20,14 +20,10 @@ namespace park
 			_threads.reserve(count);
 		}
 
-		void prepare()
-		{
-			_threads.clear();
-		}
-
 		template<typename T_Func>
 		void run(T_Func&& func)
 		{
+			_threads.clear();
 			const size_t threads = _threads.capacity();
 			for(size_t i = 0; i < threads; ++i)
 				_threads.emplace_back(func);
