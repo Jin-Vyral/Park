@@ -40,10 +40,11 @@ struct vector : public base<T_Type>
 		}
 	}
 
-	void remove(const uint32_t index)
+	uint32_t remove(const uint32_t index)
 	{
-		_removes.push_back(index);
+		const uint32_t removal = _removes.push_back(index);
 		_info[index]._removed = true;
+		return removal;
 	}
 
 	uint32_t prepare()
